@@ -1,14 +1,17 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 #[macro_use] extern crate serde_derive;
+#[macro_use] extern crate rocket;
+#[macro_use] extern crate job_scheduler;
 
 use rocket::request::Outcome;
 use rocket::http::Status;
 use rocket::request::{self, Request, FromRequest};
 use rocket_contrib::json::Json;
 use log::{warn, info};
-
-#[macro_use] extern crate rocket;
+use job_scheduler::{JobScheduler, Job};
+use std::time::Duration;
+use std::thread;
 
 struct Token(String);
 
@@ -55,5 +58,19 @@ fn new(input: Json<Action>) -> &'static str {
 }
 
 fn main(){
+    thread::spawn(|| {
+        let mut sched = JobScheduler::new();
+
+        sched.add(Job::new("1/2 * * * * *".parse().unwrap(), || {
+            println!("I created a new server");
+        }));
+        loop {
+            sched.tick();
+
+            std::thread::sleep(Duration::from_millis(500));
+        }
+    });
     rocket::ignite().mount("/", routes![coordinates]).launch();
+
+
 }
