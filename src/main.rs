@@ -12,13 +12,16 @@ use log::{warn, info};
 use job_scheduler::{JobScheduler, Job};
 use std::time::Duration;
 use std::thread;
+use stargate_grpc::*;
+use stargate_grpc::client::{AuthToken, StargateClient};
+use stargate_grpc::{Consistency, Query};
+use std::str::FromStr;
 
 struct Token(String);
 
 #[derive(Debug)]
 enum ApiTokenError {
     Missing,
-    Invalid,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -70,7 +73,13 @@ fn main(){
             std::thread::sleep(Duration::from_millis(500));
         }
     });
+    let astra_uri = "https://1deed5e7-cea8-4728-861a-96587627a8f0-1-europe-west1.apps.astra.datastax.com/stargate";
+    let bearer_token = "AstraCS:bNDycZEFkoUrnjgtyZeuIKxo:7089cf4af635dcbeccb3522cfa9e9aa645f9c4c1cfc580890eb66ff668538c17";
+    let token = AuthToken::from_str(bearer_token).unwrap();
+
+    let mut client = StargateClient::builder()
+      .uri(astra_uri).unwrap()
+      .auth_token(token)
+      .connect();
     rocket::ignite().mount("/", routes![coordinates]).launch();
-
-
 }
