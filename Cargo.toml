@@ -1,5 +1,5 @@
 [package]
-name = "webserver"
+name = "unusual_refrugee_webserver"
 version = "0.1.0"
 edition = "2021"
 
@@ -15,3 +15,4 @@ serde_derive = "1.0"
 job_scheduler = "*"
 stargate-grpc = "0.4.0"
 tokio = { version = "1", features = ["full"]}
+rand = "0.8.5"
