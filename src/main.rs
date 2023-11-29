@@ -18,6 +18,7 @@ use stargate_grpc::client::{AuthToken, StargateClient};
 use std::str::FromStr;
 use unusual_refrugee_webserver::RsMatrix;
 use rand::prelude::*;
+
 struct Token(String);
 pub fn create_random_matrix(x: usize, y: usize) -> RsMatrix {
     let mut rng = rand::thread_rng();
@@ -77,9 +78,9 @@ fn map(name: &RawStr)-> String{
 }
 
 #[post("/", format = "json", data = "<input>")]
-fn new(input: Json<Action>) -> &'static str {
+fn new(input: Json<Action>) -> Status {
     info!("Razor located: {}", input.action_type);
-    "200 Okey Dokey"
+    Status::Accepted
 }
 
 fn main(){
